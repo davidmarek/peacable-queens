@@ -65,16 +65,17 @@ create_rows(N, X) :-
 
 queens(NQ, Rows) :-
     Rows = [
-        [R11, R12, R13, R14, R15, R16, R17, R18],
-        [R21, R22, R23, R24, R25, R26, R27, R28],
-        [R31, R32, R33, R34, R35, R36, R37, R38],
-        [R41, R42, R43, R44, R45, R46, R47, R48],
-        [R51, R52, R53, R54, R55, R56, R57, R58],
-        [R61, R62, R63, R64, R65, R66, R67, R68],
-        [R71, R72, R73, R74, R75, R76, R77, R78],
-        [R81, R82, R83, R84, R85, R86, R87, R88]
+        [R11, R12, R13, R14, R15, R16, R17, R18, R19],
+        [R21, R22, R23, R24, R25, R26, R27, R28, R29],
+        [R31, R32, R33, R34, R35, R36, R37, R38, R39],
+        [R41, R42, R43, R44, R45, R46, R47, R48, R49],
+        [R51, R52, R53, R54, R55, R56, R57, R58, R59],
+        [R61, R62, R63, R64, R65, R66, R67, R68, R69],
+        [R71, R72, R73, R74, R75, R76, R77, R78, R79],
+        [R81, R82, R83, R84, R85, R86, R87, R88, R89],
+        [R91, R92, R93, R94, R95, R96, R97, R98, R99]
     ],
-    all_diags(Rows, 13, Diags),
+    all_diags(Rows, 15, Diags),
     transpose(Rows, Cols),
 
     diff_rows(Rows),

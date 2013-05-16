@@ -1,0 +1,153 @@
+\documentclass[11pt]{article}
+\usepackage{cite}
+\usepackage{hyperref}
+\usepackage{acl2013}
+\usepackage[utf8]{inputenc}
+\usepackage{times}
+\usepackage{url}
+\usepackage{latexsym}
+\usepackage{todonotes}
+
+\usepackage{amsmath}
+\usepackage{tikz}
+%\usepackage{algorithm2e}
+\usepackage{paralist}
+\usepackage{soul}
+\usepackage{multirow}
+\usepackage{color}
+%\usepackage{natbib}
+
+\usepackage{algorithmic}
+\usepackage{algorithm}
+\def\algorithmautorefname{Algorithm}
+\renewcommand*{\sectionautorefname}{Section}
+
+\newcommand{\citet}[1]{\newcite{#1}}
+\newcommand{\red}{\color{red}}
+\newcommand{\vecs}{\mathbf{s}}
+\newcommand{\veco}{\mathbf{o}}
+\newcommand{\abs}[1]{\left|#1\right|}
+
+%\setlength\titlebox{6.5cm}    % You can expand the title box if you
+% really have to
+
+\title{Peacable Armies of Queens}
+
+\author{David Marek}
+
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Úloha}
+V umělé inteligenci je známá úloha $n$-queens, kde je úkolem umístit na
+šachovnici $n$ královen tak, aby se navzájem neohrožovali. V úloze Peacable
+Armies of Queens (PAoQ) jsou královny rozděleny na dvě skupiny (bílé a černé).
+Královny v rámci jedné skupiny se mohou navzájem ohrožovat. Cílem je umístit
+$n$ bílých a $n$ černých královen na šachovnici tak, aby žádná bílá
+neohrožovala žádnou černou a naopak.
+
+\section{Popis řešení}
+Problém PAoQ jsem řešil pomocí splňování omezujících podmínek s využitím
+knihovny clpfd. Při řešení jsem experimentoval s více modely, nejprve popíšu
+finální model, který úlohu řeší a následně se v další sekci vrátím k dalším
+možným modelům a řešením, které jsem zkoušel.
+
+\subsection{Reprezentace pomocí IP}
+Výsledné řešení využívá reprezentaci podobnou celočíselnému programování (IP).
+Při IP existují pro každé pole šachovnice dvě proměnné:
+\[
+    b_{ij} = \begin{cases}
+        1 & \text{černá královna na poli $(i,j)$} \\
+        0 & \text{jinak}
+    \end{cases}
+\]
+\[
+    w_{ij} = \begin{cases}
+        1 & \text{bílá královna na poli $(i,j)$} \\
+        0 & \text{jinak}
+    \end{cases}
+\]
+
+Maximizujeme 
+$$\sum_{i=1}^n\sum_{j=1}^n b_{ij}$$
+za podmínek
+$$\sum_{i=1}^n\sum_{j=1}^n b_{ij} = \sum_{i=1}^n\sum_{j=1}^n w_{ij}$$
+$$b_{ij} + w_{ij} \le 1 ~~~~ \forall ((i_1, j_1), (i_2, j_2)) \in M$$
+$$b_{ij}, w_{ij} \in \{0, 1\} ~~~~ \forall 1 \le i, j \le n,$$
+kde $M$ je množina párů polí, která sdíli řádek, sloupec anebo diagonálu.
+
+\subsection{Reprezentace pomocí CSP}
+Při použití CSP můžeme model použitý pro celočíselné programování zjednodušit.
+Každé pole šachovnice je reprezentováno jednou proměnnou:
+
+$$
+    s_{ij} = \begin{cases}
+        2 & \text{černá královna na poli $(i,j)$}\\
+        1 & \text{bílá královna na poli $(i,j)$}\\
+        0 & \text{jinak}
+    \end{cases}
+$$
+
+Podmínku neútočení lze vyjádřit:
+$$
+\begin{array}[b]{rr}
+    & s_{i_1 j_1} = 1 \implies s_{i_2 j_2} \ne 2 \\
+    \text{a} & s_{i_1 j_1} = 2 \implies s_{i_2 j_2} \ne 1 \\
+             & \forall ((i_1, j_1), (i_2, j_2)) \in M,
+\end{array}
+$$
+
+kde $M$ je opět množina párů polí, která leží na přímce.
+
+Podmínku lze ještě zjednodušit:
+$$ s_{i_1 j_1} + s_{i_2 j_2} \ne 3 ~~~~ \forall ((i_1, j_1), (i_2, j_2)) \in M$$
+
+Tato reprezentace má $N^2$ proměnných a přibližně $4N^3$ binárních podmínek.
+
+\section{Další modely}
+
+Snažil jsem se vytvořit model s menším počtem proměnných. Je možné problém PAoQ
+modelovat tak, že proměnné jsou svázány s královnami. Pro každou královnu tak
+existovaly dvě proměnné, jedna určující řádek, na kterém královna stojí a druhá
+určující sloupec. Podmínky jsou pak nasnadě. Dvě královny s odlišnou barvou
+nesmí mít stejný sloupec, popř. řádek a také nesmí ležet na stejné diagonále.
+
+V tomto případě je ovšem mnohem více symetrií a tak je třeba pro zrychlení
+přidat další podmínky. Zabránit permutaci královen lze očíslováním královen a
+určením pořadí, v jakém se musí na šachovnici vyskytovat.
+
+Snažil jsem se vytvořit obecný algoritmus pro libovolnou velikost šachovnice,
+ale nedařilo se mi zachovat rychlost výpočtu. Při vytváření proměnných pomocí
+predikátu {\tt length} došlo k degradaci rychlosti.
+
+\section{Výsledky}
+
+Model vycházející z celočíselného programování je rychlejší pro větší problémy, 
+
+\begin{table}
+\begin{center}
+\begin{tabular}{|r|l|l|r|}
+    \hline
+    $N$ & $n$ & Q1      & Q2 \\
+    \hline
+    \hline
+    7   & 7   & 2.2     & 0.7 \\
+    \hline
+    8   & 8   & 9.7     & 2.5 \\
+    \hline
+    8   & 9   & 103.0   & 829.5 \\
+    \hline
+    9   & 9   & 6.7     & 10.0 \\
+    \hline
+    9   & 10  & 52.7    & 114.2  \\
+    \hline
+\end{tabular}
+\caption{Čas potřebný pro nalezení řešení. $N$ je strana šachovnice, $n$ je
+počet královen, Q1 je první model vycházející z IP, Q2 je druhý model s menším
+počtem proměnných. Čas je v sekundách.}
+\end{center}
+\end{table}
+
+\end{document}

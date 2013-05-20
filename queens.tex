@@ -110,7 +110,7 @@ Tato reprezentace má $N^2$ proměnných a přibližně $4N^3$ binárních podm�
 
 Snažil jsem se vytvořit model s menším počtem proměnných. Je možné problém PAoQ
 modelovat tak, že proměnné jsou svázány s královnami. Pro každou královnu tak
-existovaly dvě proměnné, jedna určující řádek, na kterém královna stojí a druhá
+existovaly dvě proměnné, jedna určující řádek, na kterém královna stojí, a druhá
 určující sloupec. Podmínky jsou pak nasnadě. Dvě královny s odlišnou barvou
 nesmí mít stejný sloupec, popř. řádek a také nesmí ležet na stejné diagonále.
 
@@ -124,11 +124,11 @@ predikátu {\tt length} došlo k degradaci rychlosti.
 
 \section{Výsledky}
 
-Model vycházející z celočíselného programování je rychlejší pro větší problémy, 
+Model vycházející z celočíselného programování je rychlejší pro větší problémy, model s méně parametry je rychlejší pro malé problémy a ty lehčí (když je počet královen menší než optimální počet).
 
 \begin{table}
 \begin{center}
-\begin{tabular}{|r|l|l|r|}
+\begin{tabular}{|r|r|r|r|}
     \hline
     $N$ & $n$ & Q1      & Q2 \\
     \hline
